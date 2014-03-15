@@ -28,9 +28,13 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
             insertString = "INSERT INTO `input_activity` (`date`, `inactivity`, `machine_name`) VALUES (CURRENT_TIMESTAMP, '%s', '%s');" % (str(packet['idleTime']), packet['machineName'])
             cur.execute(insertString)
             db.commit()
-            sendData = {'packetType': 'wsi2', 'machineName': packet['machineName'], 'idleTime': packet['idleTime'], 'timeStamp': int(time.time())}
+            idleData = Object()
+            idleData.packetType = 'wsi2'
+            idleData.machineName = packet['machineName']
+            idleData.idleTime = packet['idleTime']
+            idleData.timeStamp = int(time.time())
             for client in self.factory.clients:
-               client.sendMessage(json.dumps(sendData))
+               client.sendMessage(idleData.to_JSON())
             self.factory.unregister(self)
          elif packet['packetType'] is 2:
             audioData = Object()
