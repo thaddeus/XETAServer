@@ -49,6 +49,9 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
             windowData.windowName = packet['windowName']
             windowData.machineName = packet['machineName']
             windowData.timeStamp = int(time.time())
+            insertString = "INSERT INTO `window_activity` (`date`, `window_name`, `machine_name`) VALUES (CURRENT_TIMESTAMP, '%s', '%s');" % (packet['windowName'], packet['machineName'])
+            cur.execute(insertString)
+            db.commit()
             for client in self.factory.clients:
                client.sendMessage(windowData.to_JSON())
             self.factory.unregister(self)
